@@ -223,7 +223,7 @@ WHERE
 
 
 
--- Market Potential Analysis
+--10) Market Potential Analysis
 -- Identify top 3 city based on highest sales, return city name, total sale, total rent, total customers, estimated coffee consumer
 
 
