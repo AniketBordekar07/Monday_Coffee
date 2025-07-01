@@ -81,18 +81,18 @@ order by 2 desc;
 --Provide a list of cities along with their populations and estimated coffee consumers.
 select * from customers
 
-SELECT 
+select 
     c.city_name,
     c.population,
-    COUNT(cu.customer_id) AS coffee_consumers
-FROM 
+    count(cu.customer_id) as coffee_consumers
+from 
     city c
-JOIN 
-    customers cu ON c.city_id = cu.city_id
-GROUP BY 
+join 
+    customers cu on c.city_id = cu.city_id
+group by  
     c.city_name, c.population
-ORDER BY 
-    coffee_consumers DESC;
+order by 
+    coffee_consumers desc;
 
 
 
@@ -227,46 +227,21 @@ WHERE
 -- Identify top 3 city based on highest sales, return city name, total sale, total rent, total customers, estimated coffee consumer
 
 
-WITH city_table
-AS
-(
-	SELECT 
-		ci.city_name,
-		SUM(s.total) as total_revenue,
-		COUNT(DISTINCT s.customer_id) as total_cx,
-		ROUND(
-				SUM(s.total)::numeric/
-					COUNT(DISTINCT s.customer_id)::numeric
-				,2) as avg_sale_pr_cx
-		
-	FROM sales as s
-	JOIN customers as c
-	ON s.customer_id = c.customer_id
-	JOIN city as ci
-	ON ci.city_id = c.city_id
-	GROUP BY 1
-	ORDER BY 2 DESC
-),
-city_rent
-AS
-(
-	SELECT 
-		city_name, 
-		estimated_rent,
-		ROUND((population * 0.25)/1000000, 3) as estimated_coffee_consumer_in_millions
-	FROM city
-)
-SELECT 
-	cr.city_name,
-	total_revenue,
-	cr.estimated_rent as total_rent,
-	ct.total_cx,
-	estimated_coffee_consumer_in_millions,
-	ct.avg_sale_pr_cx,
-	ROUND(
-		cr.estimated_rent::numeric/
-									ct.total_cx::numeric
-		, 2) as avg_rent_per_cx
+select 
+    ci.city_name,
+    sum(s.total) as total_sale,
+    ci.estimated_rent as total_rent,
+    count(DISTINCT s.customer_id) as total_customers,
+    ROUND((ci.population * 0.25)/1000000, 3) as estimated_coffee_consumer_in_millions
+from sales s
+join customers c on s.customer_id = c.customer_id
+join city ci on c.city_id = ci.city_id
+group by 
+    ci.city_name, ci.estimated_rent, ci.population
+order by 
+    total_sale desc
+limit 3;
+
 FROM city_rent as cr
 JOIN city_table as ct
 ON cr.city_name = ct.city_name
